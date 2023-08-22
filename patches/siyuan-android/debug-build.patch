@@ -1,0 +1,35 @@
+diff --git forkSrcPrefix/app/build.gradle forkDstPrefix/app/build.gradle
+index 1e58d1db211836d3642a6e6fd52cb4d91ed3b018..ceb3b54f9277b4fa8adc39f5cf0f9cf3c770633d 100644
+--- forkSrcPrefix/app/build.gradle
++++ forkDstPrefix/app/build.gradle
+@@ -3,6 +3,15 @@ plugins {
+ }
+ 
+ android {
++    signingConfigs {
++        debug {
++            storeFile = file("../keystore/debug.jks")
++            storePassword System.getenv("KEYSTORE_PASSWORD")
++            keyAlias "debug"
++            keyPassword System.getenv("KEYSTORE_PASSWORD")
++        }
++    }
++
+     compileSdkVersion 33
+     buildToolsVersion "33.0.1"
+ 
+@@ -20,6 +29,14 @@ android {
+             shrinkResources true
+             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+         }
++
++        debug {
++            applicationIdSuffix ".debug"
++            minifyEnabled true
++            shrinkResources true
++            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
++            signingConfig signingConfigs.debug
++        }
+     }
+ 
+     repositories {

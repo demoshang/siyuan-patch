@@ -1,0 +1,85 @@
+From 236a7a2110368c0dbcffbf85d8c99dc901595192 Mon Sep 17 00:00:00 2001
+From: feng <xinshangshangxin@gmail.com>
+Date: Thu, 17 Aug 2023 14:47:38 +0800
+Subject: [PATCH] feat: mock vip user
+
+---
+ kernel/api/setting.go | 61 ++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 46 insertions(+), 15 deletions(-)
+
+diff --git a/kernel/api/setting.go b/kernel/api/setting.go
+index 0873bee0a..2f1142cbe 100644
+--- a/kernel/api/setting.go
++++ b/kernel/api/setting.go
+@@ -435,22 +435,53 @@ func getCloudUser(c *gin.Context) {
+ 	ret := gulu.Ret.NewResult()
+ 	defer c.JSON(http.StatusOK, ret)
+ 
+-	arg, ok := util.JsonArg(c, ret)
+-	if !ok {
+-		return
+-	}
++	// arg, ok := util.JsonArg(c, ret)
++	// if !ok {
++	// 	return
++	// }
++
++	// t := arg["token"]
++	// var token string
++	// if nil != t {
++	// 	token = t.(string)
++	// }
++	// if err := model.RefreshUser(token); nil != err {
++	// 	ret.Code = 1
++	// 	ret.Msg = err.Error()
++	// 	return
++	// }
++	// ret.Data = model.Conf.User
++
++	user := &conf.User{
++			UserId: "0",
++			UserName: "",
++			UserAvatarURL: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
++			UserHomeBImgURL: "",
++			UserTitles: []*conf.UserTitle{},
++			UserIntro: "",
++			UserNickname: "",
++			UserCreateTime: "29991231 00:00:00",
++			UserSiYuanProExpireTime: -1,
++			UserToken: "token",
++			UserTokenExpireTime: "32503593600",
++			UserSiYuanRepoSize: 0,
++			UserSiYuanPointExchangeRepoSize: 0,
++			UserSiYuanAssetSize: 0,
++			UserTrafficUpload: 0,
++			UserTrafficDownload: 0,
++			UserTrafficAPIGet: 0,
++			UserTrafficAPIPut: 0,
++			UserTrafficTime: 0,
++			UserSiYuanSubscriptionPlan: 0,
++			UserSiYuanSubscriptionStatus: 0,
++			UserSiYuanSubscriptionType: 1,
++			UserSiYuanOneTimePayStatus: 0,
++	}
++
++	model.Conf.User = user
++	model.Conf.Save()
+ 
+-	t := arg["token"]
+-	var token string
+-	if nil != t {
+-		token = t.(string)
+-	}
+-	if err := model.RefreshUser(token); nil != err {
+-		ret.Code = 1
+-		ret.Msg = err.Error()
+-		return
+-	}
+-	ret.Data = model.Conf.User
++	ret.Data = user
+ }
+ 
+ func logoutCloudUser(c *gin.Context) {
+-- 
+2.37.5
+

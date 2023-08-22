@@ -1,0 +1,42 @@
+From 5ead51c0bbaf9e90363bf7b125de6e4f11ce5d2d Mon Sep 17 00:00:00 2001
+From: feng <xinshangshangxin@gmail.com>
+Date: Thu, 17 Aug 2023 13:50:31 +0800
+Subject: [PATCH] feat: disable update
+
+---
+ kernel/api/system.go | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/kernel/api/system.go b/kernel/api/system.go
+index fc23d6800..253bb2b61 100644
+--- a/kernel/api/system.go
++++ b/kernel/api/system.go
+@@ -165,16 +165,17 @@ func addCustomEmoji(name string, items *[]map[string]interface{}) {
+ }
+ 
+ func checkUpdate(c *gin.Context) {
+-	ret := gulu.Ret.NewResult()
+-	defer c.JSON(http.StatusOK, ret)
++	// ret := gulu.Ret.NewResult()
++	// defer c.JSON(http.StatusOK, ret)
+ 
+-	arg, ok := util.JsonArg(c, ret)
+-	if !ok {
+-		return
+-	}
++	// arg, ok := util.JsonArg(c, ret)
++	// if !ok {
++	// 	return
++	// }
+ 
+-	showMsg := arg["showMsg"].(bool)
+-	model.CheckUpdate(showMsg)
++	// showMsg := arg["showMsg"].(bool)
++	// model.CheckUpdate(showMsg)
++	return
+ }
+ 
+ func exportLog(c *gin.Context) {
+-- 
+2.37.5
+
