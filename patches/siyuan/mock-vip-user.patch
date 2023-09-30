@@ -1,17 +1,8 @@
-From 236a7a2110368c0dbcffbf85d8c99dc901595192 Mon Sep 17 00:00:00 2001
-From: feng <xinshangshangxin@gmail.com>
-Date: Thu, 17 Aug 2023 14:47:38 +0800
-Subject: [PATCH] feat: mock vip user
-
----
- kernel/api/setting.go | 61 ++++++++++++++++++++++++++++++++-----------
- 1 file changed, 46 insertions(+), 15 deletions(-)
-
-diff --git a/kernel/api/setting.go b/kernel/api/setting.go
-index 0873bee0a..2f1142cbe 100644
---- a/kernel/api/setting.go
-+++ b/kernel/api/setting.go
-@@ -435,22 +435,53 @@ func getCloudUser(c *gin.Context) {
+diff --git forkSrcPrefix/kernel/api/setting.go forkDstPrefix/kernel/api/setting.go
+index e0c248e8d586cf1e64de32b935e38b513b0b896e..b4da536b24163c790b559787f49cc25aff20ec22 100644
+--- forkSrcPrefix/kernel/api/setting.go
++++ forkDstPrefix/kernel/api/setting.go
+@@ -432,18 +432,53 @@ func getCloudUser(c *gin.Context) {
  	ret := gulu.Ret.NewResult()
  	defer c.JSON(http.StatusOK, ret)
  
@@ -38,7 +29,7 @@ index 0873bee0a..2f1142cbe 100644
 +
 +	user := &conf.User{
 +			UserId: "0",
-+			UserName: "",
++			UserName: "_",
 +			UserAvatarURL: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
 +			UserHomeBImgURL: "",
 +			UserTitles: []*conf.UserTitle{},
@@ -70,16 +61,9 @@ index 0873bee0a..2f1142cbe 100644
 -	if nil != t {
 -		token = t.(string)
 -	}
--	if err := model.RefreshUser(token); nil != err {
--		ret.Code = 1
--		ret.Msg = err.Error()
--		return
--	}
+-	model.RefreshUser(token)
 -	ret.Data = model.Conf.User
 +	ret.Data = user
  }
  
  func logoutCloudUser(c *gin.Context) {
--- 
-2.37.5
-
