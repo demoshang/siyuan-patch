@@ -31,6 +31,8 @@
 2. 如果需要构建 Electron 客户端(Windows/Mac/Linux), 无需配置环境变量
 3. 如果需要构建 Android 客户端, 请执行以下步骤
     - 按照文章[生成上传密钥和密钥库](https://developer.android.com/studio/publish/app-signing?hl=zh-cn#generate-key)
+      > 注意秘钥(Key)的 `Alias` 设置成 `debug`
+      ![](https://user-images.githubusercontent.com/26966709/275674510-3fe33b8f-5aa0-4eb0-bbb6-bfdd22c1fab2.png)
     - 秘钥转成base64编码
 
         ```bash
