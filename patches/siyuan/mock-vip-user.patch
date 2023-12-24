@@ -1,10 +1,19 @@
 diff --git forkSrcPrefix/kernel/api/setting.go forkDstPrefix/kernel/api/setting.go
-index c422fb400fe9fba87f1ec012d61dd52fb3c27889..afdb6a73e987cdbb2240cbfc41178bf80767f368 100644
+index 3e546a7c5c31f3c51157e9b9bda15b0ce9f7ed73..2564cf72da0248cf59a589417e94c549b7905e48 100644
 --- forkSrcPrefix/kernel/api/setting.go
 +++ forkDstPrefix/kernel/api/setting.go
-@@ -29,6 +29,42 @@ import (
- 	"github.com/siyuan-note/siyuan/kernel/util"
- )
+@@ -509,7 +509,7 @@ func setAppearance(c *gin.Context) {
+ 	ret.Data = model.Conf.Appearance
+ }
+ 
+-func getCloudUser(c *gin.Context) {
++func getCloudUserOrigin(c *gin.Context) {
+ 	ret := gulu.Ret.NewResult()
+ 	defer c.JSON(http.StatusOK, ret)
+ 
+@@ -527,6 +527,42 @@ func getCloudUser(c *gin.Context) {
+ 	ret.Data = model.Conf.GetUser()
+ }
  
 +func getCloudUser(c *gin.Context) {
 +	ret := gulu.Ret.NewResult()
@@ -42,15 +51,6 @@ index c422fb400fe9fba87f1ec012d61dd52fb3c27889..afdb6a73e987cdbb2240cbfc41178bf8
 +	ret.Data = user
 +}
 +
- func refreshVirtualBlockRef(c *gin.Context) {
- 	// Add internal kernel API `/api/setting/refreshVirtualBlockRef` https://github.com/siyuan-note/siyuan/issues/9829
- 
-@@ -437,7 +473,7 @@ func setAppearance(c *gin.Context) {
- 	ret.Data = model.Conf.Appearance
- }
- 
--func getCloudUser(c *gin.Context) {
-+func getCloudUserOrigin(c *gin.Context) {
+ func logoutCloudUser(c *gin.Context) {
  	ret := gulu.Ret.NewResult()
  	defer c.JSON(http.StatusOK, ret)
- 
