@@ -15,16 +15,16 @@ jobs:
     steps:
       - name: clone origin
         run: |
-          mkdir -p ${{ github.workspace }}/go/src/github.com/siyuan-note/
-          cd ${{ github.workspace }}/go/src/github.com/siyuan-note/
+          mkdir -p ${{ github.workspace }}/siyuan-note/
+          cd ${{ github.workspace }}/siyuan-note/
           git clone --depth=1 https://github.com/siyuan-note/siyuan.git
-          cat ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app/package.json
+          cat ${{ github.workspace }}/siyuan-note/siyuan/app/package.json
 
       - name: Extract version from package.json
         uses: sergeysova/jq-action@v2
         id: version
         with:
-          cmd: 'jq .version "go/src/github.com/siyuan-note/siyuan/app/package.json" -r'
+          cmd: 'jq .version "siyuan-note/siyuan/app/package.json" -r'
 
   build:
     runs-on: ${{ matrix.config.os }}
@@ -69,17 +69,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          path: ${{ github.workspace }}/go/src/github.com/siyuan-note/
+          path: ${{ github.workspace }}/siyuan-note/
 
       - name: clone origin and apply patches
         run: |
-          cd ${{ github.workspace }}/go/src/github.com/siyuan-note/
+          cd ${{ github.workspace }}/siyuan-note/
 
           git clone --depth=1 https://github.com/siyuan-note/siyuan.git
           cd siyuan 
 
-          git apply ${{ github.workspace }}/go/src/github.com/siyuan-note/patches/siyuan/disable-update.patch
-          git apply ${{ github.workspace }}/go/src/github.com/siyuan-note/patches/siyuan/mock-vip-user.patch
+          git apply ${{ github.workspace }}/siyuan-note/patches/siyuan/disable-update.patch
+          git apply ${{ github.workspace }}/siyuan-note/patches/siyuan/mock-vip-user.patch
 
           git status
 
@@ -88,10 +88,12 @@ jobs:
           git clone --depth=1 https://github.com/siyuan-note/siyuan-android.git
           cd siyuan-android
 
-          git apply ${{ github.workspace }}/go/src/github.com/siyuan-note/patches/siyuan-android/debug-build.patch
+          git apply ${{ github.workspace }}/siyuan-note/patches/siyuan-android/debug-build.patch
 
           mkdir -p app/src/main/assets/
           mkdir -p app/libs/
+
+          mkdir -p ${{ github.workspace }}/go
 
       - name: Set up MingGW
         uses: msys2/setup-msys2@v2
@@ -100,7 +102,7 @@ jobs:
           install: p7zip mingw-w64-x86_64-lua
 
       - name: Set up TDM-GCC
-        run: msys2 -c "bash go/src/github.com/siyuan-note/siyuan/scripts/get-tdm-gcc.sh tdm https://github.com/jmeubank/tdm-gcc/releases/download/v10.3.0-tdm-1/tdm-gcc-10.3.0.exe" && echo "CC=${{ github.workspace }}/tdm/bin/gcc.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        run: msys2 -c "bash siyuan-note/siyuan/scripts/get-tdm-gcc.sh tdm https://github.com/jmeubank/tdm-gcc/releases/download/v10.3.0-tdm-1/tdm-gcc-10.3.0.exe" && echo "CC=${{ github.workspace }}/tdm/bin/gcc.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         if: contains( matrix.config.goarch, '386')
         working-directory: ${{ github.workspace }}
 
@@ -112,7 +114,7 @@ jobs:
       - name: Set up goversioninfo
         run: go get github.com/josephspurrier/goversioninfo/cmd/goversioninfo && go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo
         if: contains( matrix.config.goos, 'windows')
-        working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/kernel
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/kernel
         env:
           GO111MODULE: on
           CGO_ENABLED: 1
@@ -127,50 +129,50 @@ jobs:
 
       - name: Install Node pnpm
         run: npm install -g pnpm
-        working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app
 
       - name: Install Node Dependencies
         run: pnpm install --no-frozen-lockfile
-        working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app
 
       - name: Building UI
         run: pnpm run build
-        working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app
 
       - name: Remove Build Directory
         uses: JesseTG/rm@v1.0.2
         with:
-          path: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app/build
+          path: ${{ github.workspace }}/siyuan-note/siyuan/app/build
 
       - name: Remove Kernel Directory for Linux
         uses: JesseTG/rm@v1.0.2
         with:
-          path: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app/kernel-linux
+          path: ${{ github.workspace }}/siyuan-note/siyuan/app/kernel-linux
 
       - name: Remove Kernel Directory for Windows
         uses: JesseTG/rm@v1.0.2
         with:
-          path: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app/kernel
+          path: ${{ github.workspace }}/siyuan-note/siyuan/app/kernel
 
       - name: Remove Kernel Directory for macOS
         uses: JesseTG/rm@v1.0.2
         with:
-          path: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app/kernel-darwin
+          path: ${{ github.workspace }}/siyuan-note/siyuan/app/kernel-darwin
 
       - name: Remove Kernel Directory for macOS ARM64
         uses: JesseTG/rm@v1.0.2
         with:
-          path: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app/kernel-darwin-arm64
+          path: ${{ github.workspace }}/siyuan-note/siyuan/app/kernel-darwin-arm64
 
       - name: Generate Icon Resource and Properties/Version Info For Windows
         run: ${{ github.workspace }}\go\${{ matrix.config.gobin }}\goversioninfo -platform-specific=true -icon="resource\icon.ico" -manifest="resource\goversioninfo.exe.manifest"
         if: contains( matrix.config.goos, 'windows')
-        working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/kernel
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/kernel
 
       - name: Building Kernel
         if: matrix.config.target != 'android'
         run: go build --tags fts5 -o "${{ matrix.config.kernel_path }}" -v -ldflags "${{ matrix.config.build_args }}"
-        working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/kernel
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/kernel
         env:
           GO111MODULE: on
           CGO_ENABLED: 1
@@ -181,14 +183,14 @@ jobs:
       - name: Building Electron
         if: matrix.config.target != 'android'
         run: pnpm run ${{ matrix.config.electron_args }}
-        working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app
 
       - name: Upload Electron App
         if: matrix.config.target != 'android'
         uses: actions/upload-artifact@v1
         with:
           name: siyuan-${{ needs.get_version.outputs.version }}-${{ matrix.config.suffix }}
-          path: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app/build/siyuan-${{ needs.get_version.outputs.version }}-${{ matrix.config.suffix }}
+          path: ${{ github.workspace }}/siyuan-note/siyuan/app/build/siyuan-${{ needs.get_version.outputs.version }}-${{ matrix.config.suffix }}
 
       - name: gomobile
         working-directory: ${{ github.workspace }}/go
@@ -210,16 +212,16 @@ jobs:
         run: |
           gomobile bind --tags fts5 -androidapi 21 -target='android/arm64'  -ldflags '-s -w' -v -o "${{ matrix.config.kernel_path }}" ./
           ls -la "${{ matrix.config.kernel_path }}"
-        working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/kernel/mobile
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/kernel/mobile
         env:
           GO111MODULE: on
           CGO_ENABLED: 1
 
       - name: android assets
         if: contains( matrix.config.target, 'android')
-        working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan/app/
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app/
         run: |
-          zip -r ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan-android/app/src/main/assets/app.zip ./appearance ./guide ./stage ./changelogs
+          zip -r ${{ github.workspace }}/siyuan-note/siyuan-android/app/src/main/assets/app.zip ./appearance ./guide ./stage ./changelogs
 
       - name: Decode Keystore
         if: contains( matrix.config.target, 'android')
@@ -227,12 +229,12 @@ jobs:
         uses: timheuer/base64-to-file@v1.2
         with:
           fileName: "debug.jks"
-          fileDir: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan-android/keystore
+          fileDir: ${{ github.workspace }}/siyuan-note/siyuan-android/keystore
           encodedString: ${{ secrets.KEYSTORE }}
 
       - name: Building Android
         if: contains( matrix.config.target, 'android')
-        working-directory: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan-android
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan-android
         run: |
           chmod 777 ./gradlew 
           ./gradlew :app:assembleDebug
@@ -244,4 +246,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: siyuan-${{ needs.get_version.outputs.version }}-android-arm64
-          path: ${{ github.workspace }}/go/src/github.com/siyuan-note/siyuan-android/app/build/outputs/apk/debug/app-debug.apk
+          path: ${{ github.workspace }}/siyuan-note/siyuan-android/app/build/outputs/apk/debug/app-debug.apk
