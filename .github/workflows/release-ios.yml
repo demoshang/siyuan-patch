@@ -34,7 +34,13 @@ jobs:
           git apply ${{ github.workspace }}/siyuan-note/patches/siyuan/mock-vip-user.patch
 
           cd ..
+
           git clone --depth=1 https://github.com/siyuan-note/siyuan-ios.git
+          cd siyuan-ios
+          sed -i '' 's/MARKETING_VERSION =\(.*\)/MARKETING_VERSION = ${{ github.event.inputs.version }};/g' siyuan-ios.xcodeproj/project.pbxproj
+          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER =\(.*\)/PRODUCT_BUNDLE_IDENTIFIER = com.ld246.siyuan.debug;/g' siyuan-ios.xcodeproj/project.pbxproj
+          git status
+          git diff
 
       - name: Set up Go
         uses: actions/setup-go@v5
