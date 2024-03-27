@@ -14,9 +14,9 @@
 
 ## 没有 ios 应用吗?
 
-**没有**,  因为需要花钱,  不花钱的只能使用7天, 所以就不提供了
+**没有**,  因为需要花钱, 不花钱的只能使用7天, 所以就不提供了
 
-如果手机支持 [巨魔TrollStore](https://github.com/opa334/TrollStore), 可以在 [Release](https://github.com/demoshang/siyuan-patch/releases) 下载 `ipa` 文件安装
+如果手机支持 [巨魔TrollStore](https://github.com/opa334/TrollStore), 可以在 [Release](https://github.com/demoshang/siyuan-patch/releases) 下载 `ipa` 文件(未签名)安装
 
 ## 没有最新版吗?
 
@@ -31,7 +31,7 @@
     - 按照文章[生成上传密钥和密钥库](https://developer.android.com/studio/publish/app-signing?hl=zh-cn#generate-key)
       > 注意秘钥(Key)的 `Alias` 设置成 `debug`  
 
-      ![](https://user-images.githubusercontent.com/26966709/275674510-3fe33b8f-5aa0-4eb0-bbb6-bfdd22c1fab2.png)  
+      ![generate-key](https://user-images.githubusercontent.com/26966709/275674510-3fe33b8f-5aa0-4eb0-bbb6-bfdd22c1fab2.png)  
 
     - 秘钥转成base64编码
 
@@ -50,5 +50,4 @@
     - `DOCKER_HUB_PWD` 刚才保存的token
 
 5. 按如下操作点击, 等待10分钟左右进入 Release 页面查看  
-
-![image](https://github.com/demoshang/siyuan-patch/assets/26966709/d139ff11-b4a8-46ff-a532-394fddf27c54)
+    ![release-cron](https://github.com/demoshang/siyuan-patch/assets/26966709/d139ff11-b4a8-46ff-a532-394fddf27c54)
