@@ -1,4 +1,4 @@
-# siyuan patch
+# siyuan patch 思源笔记本地VIP
 
 ## 如何下载 桌面端(Windows / Mac / Linux) 和 Android 应用
 
@@ -51,3 +51,9 @@
 
 5. 按如下操作点击, 等待10分钟左右进入 Release 页面查看  
     ![release-cron](https://github.com/demoshang/siyuan-patch/assets/26966709/d139ff11-b4a8-46ff-a532-394fddf27c54)
+
+## Mac 出现 `“SiYuan.app”已损坏，无法打开。`  
+
+![image](https://github.com/demoshang/siyuan-patch/assets/26966709/b876218f-8184-4b2b-877f-a7a3fa92f2d3)
+
+下载[修复『已损坏，无法打开』.zip](https://github.com/demoshang/siyuan-patch/files/14783846/default.zip), 解压后双击运行, 然后重新打开 `SiYuan.app` 即可
