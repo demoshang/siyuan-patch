@@ -6,6 +6,9 @@ on:
       version:
         description: "release version/tag"
         required: true
+      packageManager:
+        description: "pnpm@x.x.x"
+        required: true
 
 jobs:
   build:
@@ -26,7 +29,7 @@ jobs:
           mkdir -p ${{ github.workspace }}/go
           cd ${{ github.workspace }}/siyuan-note/
 
-          git clone --branch v${{ github.event.inputs.version }} --depth=1 https://github.com/siyuan-note/siyuan.git
+          git clone --branch ${{ github.event.inputs.version }} --depth=1 https://github.com/siyuan-note/siyuan.git
           cd siyuan
 
           git apply ${{ github.workspace }}/siyuan-note/patches/siyuan/disable-update.patch
@@ -36,7 +39,7 @@ jobs:
 
           cd ..
 
-          git clone --branch v${{ github.event.inputs.version }} --depth=1 https://github.com/siyuan-note/siyuan-android.git
+          git clone --branch ${{ github.event.inputs.version }} --depth=1 https://github.com/siyuan-note/siyuan-android.git
           cd siyuan-android
 
           git apply ${{ github.workspace }}/siyuan-note/patches/siyuan-android/debug-build.patch
@@ -56,7 +59,7 @@ jobs:
           node-version: 18
 
       - name: Install Node pnpm
-        run: npm install -g pnpm
+        run: npm install -g ${{ github.event.inputs.packageManager }}
         working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app
 
       - name: Install Node Dependencies
@@ -124,5 +127,5 @@ jobs:
         with:
           upload_url: ${{ steps.get_current_release.outputs.upload_url }}
           asset_name: siyuan-${{ github.event.inputs.version }}-android-arm64.apk
-          asset_path: ${{ github.workspace }}/siyuan-note/siyuan-android/app/build/outputs/apk/debug/app-debug.apk
+          asset_path: ${{ github.workspace }}/siyuan-note/siyuan-android/app/build/outputs/apk/googleplay/debug/siyuan-*.apk
           asset_content_type: application/octet-stream
