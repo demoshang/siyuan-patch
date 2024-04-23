@@ -1,8 +1,8 @@
 diff --git forkSrcPrefix/app/build.gradle forkDstPrefix/app/build.gradle
-index d75faa03e075e7bbfdc87f8d0ce39eedcf79db44..3d3f54eb1fa12a7968a78df459eed94b9d651965 100644
+index 3a62b3e68cab5e05e3e5a3c393e751a3f9e78f5f..cb051027937c496ef920545b62aef4ed39cb8bef 100644
 --- forkSrcPrefix/app/build.gradle
 +++ forkDstPrefix/app/build.gradle
-@@ -3,6 +3,15 @@ plugins {
+@@ -30,6 +30,15 @@ android.applicationVariants.configureEach { variant ->
  }
  
  android {
@@ -15,21 +15,18 @@ index d75faa03e075e7bbfdc87f8d0ce39eedcf79db44..3d3f54eb1fa12a7968a78df459eed94b
 +        }
 +    }
 +
-     compileSdkVersion 34
-     buildToolsVersion "34"
+     namespace 'org.b3log.siyuan'
+     compileSdk 34
  
-@@ -20,6 +29,14 @@ android {
-             shrinkResources true
+@@ -56,9 +65,10 @@ android {
+         debug {
+             applicationIdSuffix ".debug"
+             minifyEnabled false
+-            resValue "string", "app_name", "SiYuan-Debug"
++            resValue "string", "app_name", "SiYuan"
+             resValue "string", "app_package_name", "org.b3log.siyuan.debug"
              proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-         }
-+
-+        debug {
-+            applicationIdSuffix ".debug"
-+            minifyEnabled true
-+            shrinkResources true
-+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 +            signingConfig signingConfigs.debug
-+        }
+         }
      }
  
-     repositories {
