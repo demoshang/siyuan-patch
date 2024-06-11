@@ -1,8 +1,8 @@
 diff --git forkSrcPrefix/kernel/api/setting.go forkDstPrefix/kernel/api/setting.go
-index 3e546a7c5c31f3c51157e9b9bda15b0ce9f7ed73..2564cf72da0248cf59a589417e94c549b7905e48 100644
+index 733c4eefd439b34b2856222f3dd0d9cdea56d19c..9d33ff2588aef54d848bb20566659c10be90836f 100644
 --- forkSrcPrefix/kernel/api/setting.go
 +++ forkDstPrefix/kernel/api/setting.go
-@@ -509,7 +509,7 @@ func setAppearance(c *gin.Context) {
+@@ -533,7 +533,7 @@ func setAppearance(c *gin.Context) {
  	ret.Data = model.Conf.Appearance
  }
  
@@ -11,7 +11,7 @@ index 3e546a7c5c31f3c51157e9b9bda15b0ce9f7ed73..2564cf72da0248cf59a589417e94c549
  	ret := gulu.Ret.NewResult()
  	defer c.JSON(http.StatusOK, ret)
  
-@@ -527,6 +527,42 @@ func getCloudUser(c *gin.Context) {
+@@ -551,6 +551,44 @@ func getCloudUser(c *gin.Context) {
  	ret.Data = model.Conf.GetUser()
  }
  
@@ -42,10 +42,12 @@ index 3e546a7c5c31f3c51157e9b9bda15b0ce9f7ed73..2564cf72da0248cf59a589417e94c549
 +			UserSiYuanSubscriptionPlan: 0,
 +			UserSiYuanSubscriptionStatus: 0,
 +			UserSiYuanSubscriptionType: 1,
-+			UserSiYuanOneTimePayStatus: 0,
++			UserSiYuanOneTimePayStatus: 1,
 +	}
 +
 +	model.Conf.User = user
++	data, _ := gulu.JSON.MarshalJSON(user)
++	model.Conf.UserData = util.AESEncrypt(string(data))
 +	model.Conf.Save()
 +
 +	ret.Data = user
