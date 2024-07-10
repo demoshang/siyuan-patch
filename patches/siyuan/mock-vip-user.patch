@@ -1,9 +1,9 @@
 diff --git forkSrcPrefix/kernel/api/setting.go forkDstPrefix/kernel/api/setting.go
-index 733c4eefd439b34b2856222f3dd0d9cdea56d19c..9d33ff2588aef54d848bb20566659c10be90836f 100644
+index 9010350078560bb298de72bc73d54e51db60f21b..dfe9ab286f50431bdb30c633b8e63886b5046419 100644
 --- forkSrcPrefix/kernel/api/setting.go
 +++ forkDstPrefix/kernel/api/setting.go
-@@ -533,7 +533,7 @@ func setAppearance(c *gin.Context) {
- 	ret.Data = model.Conf.Appearance
+@@ -586,7 +586,7 @@ func getPublish(c *gin.Context) {
+ 	}
  }
  
 -func getCloudUser(c *gin.Context) {
@@ -11,13 +11,17 @@ index 733c4eefd439b34b2856222f3dd0d9cdea56d19c..9d33ff2588aef54d848bb20566659c10
  	ret := gulu.Ret.NewResult()
  	defer c.JSON(http.StatusOK, ret)
  
-@@ -551,6 +551,44 @@ func getCloudUser(c *gin.Context) {
+@@ -608,6 +608,48 @@ func getCloudUser(c *gin.Context) {
  	ret.Data = model.Conf.GetUser()
  }
  
 +func getCloudUser(c *gin.Context) {
 +	ret := gulu.Ret.NewResult()
 +	defer c.JSON(http.StatusOK, ret)
++
++	if !model.IsAdminRoleContext(c) {
++		return
++	}
 +
 +	user := &conf.User{
 +			UserId: "0",

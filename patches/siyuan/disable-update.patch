@@ -1,17 +1,8 @@
-From 5ead51c0bbaf9e90363bf7b125de6e4f11ce5d2d Mon Sep 17 00:00:00 2001
-From: feng <xinshangshangxin@gmail.com>
-Date: Thu, 17 Aug 2023 13:50:31 +0800
-Subject: [PATCH] feat: disable update
-
----
- kernel/api/system.go | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
-
-diff --git a/kernel/api/system.go b/kernel/api/system.go
-index fc23d6800..253bb2b61 100644
---- a/kernel/api/system.go
-+++ b/kernel/api/system.go
-@@ -165,16 +165,17 @@ func addCustomEmoji(name string, items *[]map[string]interface{}) {
+diff --git forkSrcPrefix/kernel/api/system.go forkDstPrefix/kernel/api/system.go
+index 312bcbea50e14045d5b8716a73f5c786dbf95236..f021de720cb177e5cba9257894cbf28dd8d211ee 100644
+--- forkSrcPrefix/kernel/api/system.go
++++ forkDstPrefix/kernel/api/system.go
+@@ -184,16 +184,17 @@ func addCustomEmoji(name string, items *[]map[string]interface{}) {
  }
  
  func checkUpdate(c *gin.Context) {
@@ -37,6 +28,18 @@ index fc23d6800..253bb2b61 100644
  }
  
  func exportLog(c *gin.Context) {
--- 
-2.37.5
-
+diff --git forkSrcPrefix/kernel/model/mount.go forkDstPrefix/kernel/model/mount.go
+index 1ec00f1784be5d89a8ecae59f9807f6da1f20ca5..9dcbddba692ba2af923179eee296b69d403f92d5 100644
+--- forkSrcPrefix/kernel/model/mount.go
++++ forkDstPrefix/kernel/model/mount.go
+@@ -223,8 +223,8 @@ func Mount(boxID string) (alreadyMount bool, err error) {
+ 			util.PushErrMsg(Conf.Language(52), 7000)
+ 
+ 			// 每次打开帮助文档时自动检查版本更新并提醒 https://github.com/siyuan-note/siyuan/issues/5057
+-			time.Sleep(time.Second * 10)
+-			CheckUpdate(true)
++			// time.Sleep(time.Second * 10)
++			// CheckUpdate(true)
+ 		}()
+ 	}
+ 
