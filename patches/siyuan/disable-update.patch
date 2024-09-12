@@ -1,20 +1,21 @@
-diff --git forkSrcPrefix/kernel/model/mount.go forkDstPrefix/kernel/model/mount.go
-index 1ec00f1784be5d89a8ecae59f9807f6da1f20ca5..9dcbddba692ba2af923179eee296b69d403f92d5 100644
---- forkSrcPrefix/kernel/model/mount.go
-+++ forkDstPrefix/kernel/model/mount.go
-@@ -223,8 +223,8 @@ func Mount(boxID string) (alreadyMount bool, err error) {
- 			util.PushErrMsg(Conf.Language(52), 7000)
- 
- 			// 每次打开帮助文档时自动检查版本更新并提醒 https://github.com/siyuan-note/siyuan/issues/5057
--			time.Sleep(time.Second * 10)
--			CheckUpdate(true)
-+			// time.Sleep(time.Second * 10)
-+			// CheckUpdate(true)
- 		}()
+diff --git forkSrcPrefix/kernel/model/updater.go forkDstPrefix/kernel/model/updater.go
+index f902b49d6b32d35318eb0b237037f2b4f79b8d33..cdbbc35027afb7c1173056105065268d238f68e2 100644
+--- forkSrcPrefix/kernel/model/updater.go
++++ forkDstPrefix/kernel/model/updater.go
+@@ -306,6 +306,11 @@ func skipNewVerInstallPkg() bool {
  	}
- 
+ 	if !Conf.System.DownloadInstallPkg {
+ 		return true
++	} else {
++		// Conf.System.DownloadInstallPkg(自动下载更新安装包) 强制赋值为false
++		Conf.System.DownloadInstallPkg = false
++		Conf.Save()
++		return true
+ 	}
+ 	if gulu.OS.IsWindows() {
+ 		plat := strings.ToLower(Conf.System.OSPlatform)
 diff --git forkSrcPrefix/kernel/api/system.go forkDstPrefix/kernel/api/system.go
-index 312bcbea50e14045d5b8716a73f5c786dbf95236..f021de720cb177e5cba9257894cbf28dd8d211ee 100644
+index 51af4472aab1930b520dd923bb643ca4bf81aaa2..0b0d90f4276fae27fa0468155e1edb8eff15cfed 100644
 --- forkSrcPrefix/kernel/api/system.go
 +++ forkDstPrefix/kernel/api/system.go
 @@ -184,16 +184,17 @@ func addCustomEmoji(name string, items *[]map[string]interface{}) {
@@ -43,19 +44,18 @@ index 312bcbea50e14045d5b8716a73f5c786dbf95236..f021de720cb177e5cba9257894cbf28d
  }
  
  func exportLog(c *gin.Context) {
-diff --git forkSrcPrefix/kernel/model/updater.go forkDstPrefix/kernel/model/updater.go
-index dd1c3af48360709216f8e4b95beb841836cf00d8..ad6473a1684930f2b17d680dfd827c2fd5497cbb 100644
---- forkSrcPrefix/kernel/model/updater.go
-+++ forkDstPrefix/kernel/model/updater.go
-@@ -306,6 +306,11 @@ func skipNewVerInstallPkg() bool {
+diff --git forkSrcPrefix/kernel/model/mount.go forkDstPrefix/kernel/model/mount.go
+index cc55d4543130128cf0a78ef43c6cd982fa45c151..ae12417e2dedd0854182c654ed29768920eec673 100644
+--- forkSrcPrefix/kernel/model/mount.go
++++ forkDstPrefix/kernel/model/mount.go
+@@ -222,8 +222,8 @@ func Mount(boxID string) (alreadyMount bool, err error) {
+ 		task.AppendAsyncTaskWithDelay(task.PushMsg, 3*time.Second, util.PushErrMsg, Conf.Language(52), 7000)
+ 		go func() {
+ 			// 每次打开帮助文档时自动检查版本更新并提醒 https://github.com/siyuan-note/siyuan/issues/5057
+-			time.Sleep(time.Second * 10)
+-			CheckUpdate(true)
++			// time.Sleep(time.Second * 10)
++			// CheckUpdate(true)
+ 		}()
  	}
- 	if !Conf.System.DownloadInstallPkg {
- 		return true
-+	} else {
-+		// Conf.System.DownloadInstallPkg(自动下载更新安装包) 强制赋值为false
-+		Conf.System.DownloadInstallPkg = false
-+		Conf.Save()
-+		return true
- 	}
- 	if gulu.OS.IsWindows() {
- 		plat := strings.ToLower(Conf.System.OSPlatform)
+ 
