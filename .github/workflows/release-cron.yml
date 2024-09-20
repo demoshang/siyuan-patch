@@ -53,7 +53,6 @@ jobs:
 
           androidId=$(echo "$response" | jq -r '.workflows | .[] | select(.path | contains("release-android.yml")) | .id')
           pcId=$(echo "$response" | jq -r '.workflows | .[] | select(.path | contains("release-pc.yml")) | .id')
-          pcId=$(echo "$response" | jq -r '.workflows | .[] | select(.path | contains("release-pc.yml")) | .id')
           dockerId=$(echo "$response" | jq -r '.workflows | .[] | select(.path | contains("release-docker.yml")) | .id')
           iosId=$(echo "$response" | jq -r '.workflows | .[] | select(.path | contains("release-ios.yml")) | .id')
 
