@@ -1,4 +1,4 @@
-# siyuan patch 思源笔记本地VIP
+# siyuan patch [思源笔记](https://github.com/siyuan-note/siyuan)本地VIP
 
 ## 如何下载 桌面端(Windows / Mac / Linux) 和 Android 应用
 
