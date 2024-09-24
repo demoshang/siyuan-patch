@@ -81,6 +81,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: ${{ github.workspace }}/siyuan-note/siyuan/kernel/go.mod
+          cache-dependency-path: "**/*.sum"
       - run: go version
 
       - name: Set up goversioninfo
