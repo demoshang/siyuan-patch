@@ -1,14 +1,28 @@
 diff --git forkSrcPrefix/kernel/conf/system.go forkDstPrefix/kernel/conf/system.go
-index e43d3184a7393bf02f1ba135d8bb79dce4f85077..890aaaf16e49b30e4cacffca8101d62af57fc8e1 100644
+index e3acc95435abc18c6334be12637bdc48a7ea9762..7ffafaa1f254994248532bb555941cac087689e3 100644
 --- forkSrcPrefix/kernel/conf/system.go
 +++ forkDstPrefix/kernel/conf/system.go
-@@ -52,6 +52,8 @@ func NewSystem() *System {
+@@ -53,6 +53,7 @@ func NewSystem() *System {
  		Name:               util.GetDeviceName(),
  		KernelVersion:      util.Ver,
  		NetworkProxy:       &NetworkProxy{},
-+		UploadErrLog: 			false,
 +		DisableGoogleAnalytics: true,
  		DownloadInstallPkg: false,
+ 	}
+ }
+diff --git forkSrcPrefix/kernel/conf/sync.go forkDstPrefix/kernel/conf/sync.go
+index 488cb9e5701adc964635376373202516656b1f9a..4e2a457fe7ff2dec817c2e0ae9de610d1412cbd3 100644
+--- forkSrcPrefix/kernel/conf/sync.go
++++ forkDstPrefix/kernel/conf/sync.go
+@@ -36,8 +36,8 @@ func NewSync() *Sync {
+ 		Enabled:             false,
+ 		Perception:          false,
+ 		Mode:                1,
+-		GenerateConflictDoc: false,
+-		Provider:            ProviderSiYuan,
++		GenerateConflictDoc: true,
++		Provider:            ProviderS3,
+ 		Interval:            30,
  	}
  }
 diff --git forkSrcPrefix/kernel/conf/account.go forkDstPrefix/kernel/conf/account.go
@@ -25,23 +39,8 @@ index 5e3b51fb8f9d2944a2cacef66cdc3bc9bd365c5a..d4f4e00dea010730b557f7c122b624fb
 +		DisplayVIP:   false,
  	}
  }
-diff --git forkSrcPrefix/kernel/conf/sync.go forkDstPrefix/kernel/conf/sync.go
-index 31a7bb2d28a6e3896d8493707b0231a45252dc11..a75de28344e0a881459371f36ab75860e391c4b0 100644
---- forkSrcPrefix/kernel/conf/sync.go
-+++ forkDstPrefix/kernel/conf/sync.go
-@@ -35,8 +35,8 @@ func NewSync() *Sync {
- 		Enabled:             false,
- 		Perception:          false,
- 		Mode:                1,
--		GenerateConflictDoc: false,
--		Provider:            ProviderSiYuan,
-+		GenerateConflictDoc: true,
-+		Provider:            ProviderS3,
- 	}
- }
- 
 diff --git forkSrcPrefix/kernel/conf/appearance.go forkDstPrefix/kernel/conf/appearance.go
-index 107abbac6e7215c3e02c05daf3a37499450a9fb9..219923da027473330f2ee84d8de08aa75be14159 100644
+index ebd1002acf907e4afb3524fe5adcf672a850646b..1df2f4761587468cadf8f6d43573836790473f22 100644
 --- forkSrcPrefix/kernel/conf/appearance.go
 +++ forkDstPrefix/kernel/conf/appearance.go
 @@ -44,8 +44,8 @@ func NewAppearance() *Appearance {
