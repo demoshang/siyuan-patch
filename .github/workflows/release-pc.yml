@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         config:
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             kernel_path: "../app/kernel-linux/SiYuan-Kernel"
             build_args: "-s -w -X github.com/siyuan-note/siyuan/kernel/util.Mode=prod"
             electron_args: "dist-linux"
