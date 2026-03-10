@@ -1,17 +1,17 @@
 diff --git forkSrcPrefix/app/build.gradle forkDstPrefix/app/build.gradle
-index 6922a27f97cc37fa3490c9b0ab5b8dd2002044a0..7a3e6bbdb0d40871ef51128f2b6b8ce756d506ae 100644
+index e0ec580f86404f2eda00bca72ad3f19c1b744973..8e5bcea2a21820887b94f9fbd5b9b9a60b5608c3 100644
 --- forkSrcPrefix/app/build.gradle
 +++ forkDstPrefix/app/build.gradle
-@@ -4,7 +4,7 @@ plugins {
+@@ -5,7 +5,7 @@ plugins {
  
- // 多渠道打包配置已引用的方式传递
+ // 多渠道打包配置
  apply from: rootProject.file('flavors.gradle')
 -apply from: rootProject.file('signings.gradle')
 +// apply from: rootProject.file('signings.gradle')
  apply from: rootProject.file('buildRelease.gradle')
  
- // By appending the version name, build type, and a timestamp to the APK filename,
-@@ -41,6 +41,22 @@ android {
+ // 1. 配置 App Bundle (.aab) 的基础文件名
+@@ -46,6 +46,23 @@ android {
          versionName siyuanVersionName
      }
  
@@ -31,10 +31,11 @@ index 6922a27f97cc37fa3490c9b0ab5b8dd2002044a0..7a3e6bbdb0d40871ef51128f2b6b8ce7
 +        }
 +    }
 +
-     buildTypes {
-         release {
-             // 正式版打包时指定签名证书
-@@ -56,11 +72,13 @@ android {
++
+     buildFeatures {
+         buildConfig true
+     }
+@@ -65,11 +82,13 @@ android {
              proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
          }
          debug {
