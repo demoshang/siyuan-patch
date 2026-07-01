@@ -1,21 +1,8 @@
-diff --git forkSrcPrefix/kernel/conf/system.go forkDstPrefix/kernel/conf/system.go
-index 58b0475a23d93b94fe662e57ba8d09b932ee2d59..614602a8df3b7c83a20902e75d724059cb227112 100644
---- forkSrcPrefix/kernel/conf/system.go
-+++ forkDstPrefix/kernel/conf/system.go
-@@ -54,7 +54,7 @@ func NewSystem() *System {
- 		Name:               util.GetDeviceName(),
- 		KernelVersion:      util.Ver,
- 		NetworkProxy:       &NetworkProxy{},
--		DownloadInstallPkg: true,
-+		DownloadInstallPkg: false,
- 	}
- }
- 
 diff --git forkSrcPrefix/kernel/model/updater.go forkDstPrefix/kernel/model/updater.go
-index e29a756371ea8236de2d5c5e80771b83359be42c..13597c729a42f8975e3b631a209ed95b946e3bb5 100644
+index d1773fb3f1c6b6f61ba124aec081edd573996943..cbc13a8d69341fb40254b1665653cd10531cffa3 100644
 --- forkSrcPrefix/kernel/model/updater.go
 +++ forkDstPrefix/kernel/model/updater.go
-@@ -308,6 +308,10 @@ func isVersionUpToDate(releaseVer string) bool {
+@@ -312,6 +312,10 @@ func isVersionUpToDate(releaseVer string) bool {
  var skipInstallPkgPlatformCached = -1
  
  func skipNewVerInstallPkg() bool {
@@ -26,11 +13,39 @@ index e29a756371ea8236de2d5c5e80771b83359be42c..13597c729a42f8975e3b631a209ed95b
  	if skipInstallPkgPlatformCached == -1 {
  		skipInstallPkgPlatformCached = 0
  		if !gulu.OS.IsWindows() && !gulu.OS.IsDarwin() {
+diff --git forkSrcPrefix/kernel/model/mount.go forkDstPrefix/kernel/model/mount.go
+index b34f88cf23f43f4db768dbab940c05533959ad77..e3f8a9ee8d8519863a279479403735124e8a6542 100644
+--- forkSrcPrefix/kernel/model/mount.go
++++ forkDstPrefix/kernel/model/mount.go
+@@ -276,8 +276,8 @@ func Mount(boxID string) (alreadyMount bool, err error) {
+ 		task.AppendAsyncTaskWithDelay(task.PushMsg, 3*time.Second, util.PushErrMsg, Conf.Language(244), 7000)
+ 		go func() {
+ 			// 每次打开帮助文档时自动检查版本更新并提醒 https://github.com/siyuan-note/siyuan/issues/5057
+-			time.Sleep(time.Second * 10)
+-			CheckUpdate(true)
++			// time.Sleep(time.Second * 10)
++			// CheckUpdate(true)
+ 		}()
+ 	}
+ 
+diff --git forkSrcPrefix/kernel/conf/system.go forkDstPrefix/kernel/conf/system.go
+index 60ccf4f175b02f38c420c86cb33b27f04d6b6ea2..d8682bff5300e1877f521cda72289b9f2228e648 100644
+--- forkSrcPrefix/kernel/conf/system.go
++++ forkDstPrefix/kernel/conf/system.go
+@@ -57,7 +57,7 @@ func NewSystem() *System {
+ 		Name:               util.GetDeviceName(),
+ 		KernelVersion:      util.Ver,
+ 		NetworkProxy:       &NetworkProxy{},
+-		DownloadInstallPkg: true,
++		DownloadInstallPkg: false,
+ 	}
+ }
+ 
 diff --git forkSrcPrefix/kernel/api/system.go forkDstPrefix/kernel/api/system.go
-index a903f12ad254f327c2e925f6c9e3d06f10056839..0586dc065b61790ae971e7c6f298a19afa1825f8 100644
+index bb3aa788c4ee166bc5f8152955484c29ce95b669..a5a210465120418c81b526368aa9cc1b74b24b5c 100644
 --- forkSrcPrefix/kernel/api/system.go
 +++ forkDstPrefix/kernel/api/system.go
-@@ -264,16 +264,17 @@ func addCustomEmoji(name string, items *[]map[string]interface{}) {
+@@ -274,16 +274,17 @@ func addCustomEmoji(name string, items *[]map[string]any) {
  }
  
  func checkUpdate(c *gin.Context) {
@@ -56,18 +71,3 @@ index a903f12ad254f327c2e925f6c9e3d06f10056839..0586dc065b61790ae971e7c6f298a19a
  }
  
  func exportLog(c *gin.Context) {
-diff --git forkSrcPrefix/kernel/model/mount.go forkDstPrefix/kernel/model/mount.go
-index 6ac4df43a1ca9b664b788b78da621b3c9d762613..537872e957f27e539e27d5300961d159cc40505a 100644
---- forkSrcPrefix/kernel/model/mount.go
-+++ forkDstPrefix/kernel/model/mount.go
-@@ -236,8 +236,8 @@ func Mount(boxID string) (alreadyMount bool, err error) {
- 		task.AppendAsyncTaskWithDelay(task.PushMsg, 3*time.Second, util.PushErrMsg, Conf.Language(52), 7000)
- 		go func() {
- 			// 每次打开帮助文档时自动检查版本更新并提醒 https://github.com/siyuan-note/siyuan/issues/5057
--			time.Sleep(time.Second * 10)
--			CheckUpdate(true)
-+			// time.Sleep(time.Second * 10)
-+			// CheckUpdate(true)
- 		}()
- 	}
- 
