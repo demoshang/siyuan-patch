@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         config:
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             kernel_path: "../../../siyuan-android/app/libs/kernel.aar"
 
     steps:
@@ -49,20 +49,28 @@ jobs:
           mkdir -p app/libs/
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: ${{ github.workspace }}/siyuan-note/siyuan/kernel/go.mod
-          cache-dependency-path: "**/*.sum"
+          cache-dependency-path: ${{ github.workspace }}/siyuan-note/siyuan/kernel/go.sum
+          cache: true
       - run: go version
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install Node pnpm
         run: npm install -g ${{ github.event.inputs.packageManager }}
         working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app
+
+      - name: Cache pnpm store
+        uses: actions/cache@v5
+        with:
+          path: ~/.pnpm-store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('app/pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
 
       - name: Install Node Dependencies
         run: pnpm install --no-frozen-lockfile
@@ -72,28 +80,62 @@ jobs:
         run: pnpm run build
         working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app
 
-      - name: gomobile
-        working-directory: ${{ github.workspace }}/go
-        run: |
-          go install golang.org/x/mobile/cmd/gomobile@latest
-          gomobile init
-
       - name: Set up java
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
-          java-version: "17"
-          cache: "gradle"
+          java-version: "21"
+
+      - name: Set up Android NDK
+        # 锁定 NDK r28b(与本地开发环境同版本)。sdkmanager 不在 PATH 上
+        # (actions/runner-images#13674),用全路径调用;同时预接受 SDK 许可,
+        # 避免 NDK 安装卡在交互式许可确认。
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            SDKMANAGER=$(ls "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager 2>/dev/null | head -1)
+          fi
+          if [ -z "$SDKMANAGER" ]; then
+            echo "ERROR: sdkmanager not found under $ANDROID_HOME/cmdline-tools/"
+            exit 1
+          fi
+          echo "Using sdkmanager: $SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+          "$SDKMANAGER" "ndk;28.2.13676358" > /dev/null
+          NDK_DIR="$ANDROID_HOME/ndk/28.2.13676358"
+          echo "ANDROID_NDK_HOME=$NDK_DIR" >> $GITHUB_ENV
+          echo "ANDROID_NDK_ROOT=$NDK_DIR" >> $GITHUB_ENV
+          echo "Installed NDK r28b at $NDK_DIR"
+
+      - name: Set up gomobile
+        # 锁定到 kernel/go.mod 中 x/mobile 模块的同一版本,避免工具与库版本漂移。
+        # GOPATH 被显式指向 workspace 下,go install 的产物在 $GOPATH/bin,
+        # 该目录不在默认 PATH 上,需用全路径调用并写入 $GITHUB_PATH 供后续步骤使用。
+        run: |
+          go install golang.org/x/mobile/cmd/gomobile@2553ed8ce294
+          echo "$GOPATH/bin" >> $GITHUB_PATH
+          "$GOPATH/bin/gomobile" init
+        env:
+          GOPATH: ${{ github.workspace }}/go
 
       - name: Building Android Kernel
-        run: |
-          gomobile bind --tags fts5 -androidapi 21 -target='android/arm64'  -ldflags '-s -w' -v -o "${{ matrix.config.kernel_path }}" ./
-          ls -la "${{ matrix.config.kernel_path }}"
+        run: gomobile bind -tags fts5 -ldflags "-s -w" -v -o "${{ matrix.config.kernel_path }}" -target android/arm64 -androidapi 26 ./
         working-directory: ${{ github.workspace }}/siyuan-note/siyuan/kernel/mobile
         env:
+          GOPATH: ${{ github.workspace }}/go
           GO111MODULE: on
           CGO_ENABLED: 1
 
+      - name: Patch siyuan-android Repositories
+        # siyuan-android 默认把阿里云镜像排在最前,某些依赖(如 org.apache:apache:31)
+        # 在阿里云镜像缺失会导致解析失败。CI 在海外,直接走 google()/mavenCentral()
+        # 更稳;sed 删除所有 maven.aliyun.com 行,保留官方仓库。
+        run: |
+          sed -i '/maven.aliyun.com/d' build.gradle
+          echo "=== Patched build.gradle repositories ==="
+          grep -A 6 "repositories" build.gradle | head -20
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan-android
+        
       - name: android assets
         working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app/
         run: |

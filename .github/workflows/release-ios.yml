@@ -53,20 +53,28 @@ jobs:
           git diff
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: ${{ github.workspace }}/siyuan-note/siyuan/kernel/go.mod
-          cache-dependency-path: "**/*.sum"
+          cache-dependency-path: ${{ github.workspace }}/siyuan-note/siyuan/kernel/go.sum
+          cache: true
       - run: go version
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install Node pnpm
         run: npm install -g ${{ github.event.inputs.packageManager }}
         working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app
+
+      - name: Cache pnpm store
+        uses: actions/cache@v5
+        with:
+          path: ~/.pnpm-store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('app/pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
 
       - name: Install Node Dependencies
         run: pnpm install --no-frozen-lockfile
@@ -76,17 +84,23 @@ jobs:
         run: pnpm run build
         working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app
 
-      - name: gomobile
-        working-directory: ${{ github.workspace }}/go
+      - name: Set up gomobile
+        # 锁定到 kernel/go.mod 中 x/mobile 模块的同一版本,避免工具与库版本漂移。
+        # GOPATH 被显式指向 workspace 下,go install 的产物在 $GOPATH/bin,
+        # 该目录不在默认 PATH 上,需用全路径调用并写入 $GITHUB_PATH 供后续步骤使用。
         run: |
-          go install golang.org/x/mobile/cmd/gomobile@latest
-          gomobile init
+          go install golang.org/x/mobile/cmd/gomobile@2553ed8ce294
+          echo "$GOPATH/bin" >> $GITHUB_PATH
+          "$GOPATH/bin/gomobile" init
+        env:
+          GOPATH: ${{ github.workspace }}/go
 
       - name: Building ios Kernel
         run: |
           gomobile bind --tags fts5 -ldflags '-s -w' -v -target=ios -o "${{ matrix.config.kernel_path }}" ./
         working-directory: ${{ github.workspace }}/siyuan-note/siyuan/kernel/mobile
         env:
+          GOPATH: ${{ github.workspace }}/go
           GO111MODULE: on
           CGO_ENABLED: 1
 
