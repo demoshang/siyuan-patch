@@ -60,9 +60,9 @@ jobs:
           git clone --branch ${{ github.event.inputs.version }} --depth=1 https://github.com/siyuan-note/siyuan.git
           cd siyuan
 
-          git apply ${{ github.workspace }}/siyuan-note/patches/siyuan/disable-update.patch
-          git apply ${{ github.workspace }}/siyuan-note/patches/siyuan/default-config.patch
-          git apply ${{ github.workspace }}/siyuan-note/patches/siyuan/mock-vip-user.patch
+          git apply --ignore-whitespace ${{ github.workspace }}/siyuan-note/patches/siyuan/disable-update.patch
+          git apply --ignore-whitespace ${{ github.workspace }}/siyuan-note/patches/siyuan/default-config.patch
+          git apply --ignore-whitespace ${{ github.workspace }}/siyuan-note/patches/siyuan/mock-vip-user.patch
 
           git status
 
