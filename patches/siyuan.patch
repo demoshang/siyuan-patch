@@ -151,7 +151,7 @@ index c6fe820dc2..4a3cb57973 100644
  })
  
  var getCloudUser = contractHandler(apicontract.GetCloudUser, func(c *gin.Context, request apicontract.SettingCloudUserRequest) apicontract.Response[*apicontract.SettingUser] {
--	user, err := model.RefreshUser(request.Token)
+-	user, err := model.GetCloudUser(request.Token, request.Cached)
 -	data := settingUserPayload(user)
 -	if err == nil {
 -		return apicontract.Success(data)
