@@ -1,0 +1,119 @@
+name: release-mac-arm64
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "release version/tag (e.g. v3.8.6)"
+        required: true
+        type: string
+      packageManager:
+        description: "pnpm@x.x.x"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      matrix:
+        config:
+          - os: macos-latest
+            kernel_path: "../app/kernel-darwin-arm64/SiYuan-Kernel"
+            build_args: "-s -w -X github.com/siyuan-note/siyuan/kernel/util.Mode=prod"
+            electron_args: "dist-darwin-arm64"
+            goos: "darwin"
+            goarch: "arm64"
+            suffix: "mac-arm64.dmg"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: siyuan-note
+
+      - name: Clone origin and apply patches
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          mkdir -p "${{ github.workspace }}/go"
+          cd "${{ github.workspace }}/siyuan-note"
+          git clone --branch "$VERSION" https://github.com/siyuan-note/siyuan.git
+          cd siyuan
+          git apply --3way "${{ github.workspace }}/siyuan-note/patches/siyuan.patch"
+          git status
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ github.workspace }}/siyuan-note/siyuan/kernel/go.mod
+          cache-dependency-path: ${{ github.workspace }}/siyuan-note/siyuan/kernel/go.sum
+          cache: true
+
+      - run: go version
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install pnpm
+        env:
+          PACKAGE_MANAGER: ${{ inputs.packageManager }}
+        run: npm install -g "$PACKAGE_MANAGER"
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app
+
+      - name: Get pnpm store directory
+        id: pnpm_store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app
+
+      - name: Cache pnpm store
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.pnpm_store.outputs.path }}
+          key: pnpm-${{ runner.os }}-${{ runner.arch }}-${{ inputs.packageManager }}-${{ hashFiles('siyuan-note/siyuan/app/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-${{ runner.arch }}-${{ inputs.packageManager }}-
+
+      - name: Install Node dependencies
+        run: pnpm install --no-frozen-lockfile
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app
+
+      - name: Build UI
+        run: pnpm run build
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app
+
+      - name: Build kernel
+        run: go build --tags "fts5 sqlcipher" -o "${{ matrix.config.kernel_path }}" -v -ldflags "${{ matrix.config.build_args }}"
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/kernel
+        env:
+          GO111MODULE: "on"
+          CGO_ENABLED: "1"
+          GOOS: ${{ matrix.config.goos }}
+          GOPATH: ${{ github.workspace }}/go
+          GOARCH: ${{ matrix.config.goarch }}
+
+      - name: Build Electron
+        run: pnpm run ${{ matrix.config.electron_args }}
+        working-directory: ${{ github.workspace }}/siyuan-note/siyuan/app
+
+      - uses: joutvhu/get-release@v1
+        id: get_current_release
+        with:
+          tag_name: ${{ inputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Electron app
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: ${{ github.workspace }}/siyuan-note/siyuan/app/build/siyuan-*-${{ matrix.config.suffix }}
+          allowUpdates: true
+          omitBody: true
+          omitName: true
+          tag: ${{ inputs.version }}
+          replacesArtifacts: false
