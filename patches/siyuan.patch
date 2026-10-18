@@ -1,22 +1,54 @@
-diff --git forkSrcPrefix/kernel/model/cloud_service.go forkDstPrefix/kernel/model/cloud_service.go
-index 97c6462ee261ae22c45a2ac24e897451878fe70f..13e5e6aa87f6796f037c2e0ed7d05dbbb96c2e36 100644
---- forkSrcPrefix/kernel/model/cloud_service.go
-+++ forkDstPrefix/kernel/model/cloud_service.go
-@@ -315,6 +315,9 @@ func refreshSubscriptionExpirationRemind() {
- func refreshUser() {
- 	defer logging.Recover()
+diff --git forkSrcPrefix/kernel/conf/appearance.go forkDstPrefix/kernel/conf/appearance.go
+index a941a562cd98cdf873ed36d45317864d9f3677c8..018b23aa7aec0da4be891b1a1edf5316fe1522c2 100644
+--- forkSrcPrefix/kernel/conf/appearance.go
++++ forkDstPrefix/kernel/conf/appearance.go
+@@ -69,8 +69,8 @@ func NewAppearanceForContainer(mobile bool) *Appearance {
+ 		Icon:                "litheness",
+ 		CodeBlockThemeLight: "github",
+ 		CodeBlockThemeDark:  "base16/dracula",
+-		Lang:                "en",
+-		CloseButtonBehavior: 0,
++		Lang:                "zh_CN",
++		CloseButtonBehavior: 1,
+ 		HideToolbar:         true,
+ 		HideStatusBar:       false,
+ 		StatusBar:           util.NewStatusBar(mobile),
+diff --git forkSrcPrefix/kernel/model/updater.go forkDstPrefix/kernel/model/updater.go
+index 480277b5a70d542cc0f5be5c22c94f7ae8b83369..e0048a39cdedf0c4d6895617c26494bea95495f6 100644
+--- forkSrcPrefix/kernel/model/updater.go
++++ forkDstPrefix/kernel/model/updater.go
+@@ -286,6 +286,8 @@ func isVersionUpToDate(releaseVer string) bool {
+ var skipInstallPkgPlatformCached = -1
  
-+	// 本地 mock 构建禁用云端账号刷新，避免伪造 token 触发「获取社区用户账号失败」报错
-+	return
+ func skipNewVerInstallPkg() bool {
++	return true
 +
- 	if nil != Conf.GetUser() {
- 		time.Sleep(2 * time.Minute)
- 		if nil != Conf.GetUser() {
+ 	confSystemSnapshot := Conf.LoadSystem()
+ 
+ 	if skipInstallPkgPlatformCached == -1 {
+diff --git forkSrcPrefix/kernel/api/system.go forkDstPrefix/kernel/api/system.go
+index edf151e8eb5af3d51a068f3ba019f5d6730f76d5..46c5498306b654297a0e7a6e27a760c9c2bbf9e5 100644
+--- forkSrcPrefix/kernel/api/system.go
++++ forkDstPrefix/kernel/api/system.go
+@@ -423,10 +423,10 @@ func normalizeCustomEmojiPath(name, ext string) (string, error) {
+ }
+ 
+ var checkUpdate = contractHandler(apicontract.SystemCheckUpdate, func(c *gin.Context, request apicontract.SystemCheckUpdateRequest) (ret apicontract.Response[apicontract.Null]) {
+-	ret = apicontract.Success(apicontract.Null{})
++	// ret = apicontract.Success(apicontract.Null{})
+ 
+-	showMsg := request.ShowMsg
+-	model.CheckUpdate(showMsg)
++	// showMsg := request.ShowMsg
++	// model.CheckUpdate(showMsg)
+ 	return
+ })
+ 
 diff --git forkSrcPrefix/kernel/api/setting.go forkDstPrefix/kernel/api/setting.go
-index db0dcf1ce588af8ddc8242a6106b501152424895..fb8c5ef3e1dd3290ae8edbdd70c5d8728faafc56 100644
+index d5470a9d340b2701921399a9982c1c29ec2af2b4..5fa25988e857888450655d02ecd7364824c0a45d 100644
 --- forkSrcPrefix/kernel/api/setting.go
 +++ forkDstPrefix/kernel/api/setting.go
-@@ -828,18 +828,37 @@ var getPublish = contractHandler(apicontract.GetPublish, func(c *gin.Context, re
+@@ -699,18 +699,37 @@ var getPublish = contractHandler(apicontract.GetPublish, func(c *gin.Context, re
  })
  
  var getCloudUser = contractHandler(apicontract.GetCloudUser, func(c *gin.Context, request apicontract.SettingCloudUserRequest) apicontract.Response[*apicontract.SettingUser] {
@@ -66,42 +98,11 @@ index db0dcf1ce588af8ddc8242a6106b501152424895..fb8c5ef3e1dd3290ae8edbdd70c5d872
  }, func(c *gin.Context) *apicontract.Response[*apicontract.SettingUser] {
  	if model.IsAdminRoleContext(c) {
  		return nil
-diff --git forkSrcPrefix/kernel/conf/system.go forkDstPrefix/kernel/conf/system.go
-index 51ae3802eea81f3e7e297acc743f893e9b491170..429eeba8471a831513957041662e0c4b27edefa0 100644
---- forkSrcPrefix/kernel/conf/system.go
-+++ forkDstPrefix/kernel/conf/system.go
-@@ -79,7 +79,7 @@ func NewSystem() *System {
- 		Name:               util.GetDeviceName(),
- 		KernelVersion:      util.Ver,
- 		NetworkProxy:       &NetworkProxy{},
--		DownloadInstallPkg: true,
-+		DownloadInstallPkg: false,
- 		UpdateChannel:      UpdateChannelStable,
- 	}
- }
-diff --git forkSrcPrefix/kernel/api/system.go forkDstPrefix/kernel/api/system.go
-index 3520fc03bda194614a6d0f8fb651e5dbc4e06fe9..7d279000804e8a2427d340dce964119a9b826e3b 100644
---- forkSrcPrefix/kernel/api/system.go
-+++ forkDstPrefix/kernel/api/system.go
-@@ -424,10 +424,10 @@ func normalizeCustomEmojiPath(name, ext string) (string, error) {
- }
- 
- var checkUpdate = contractHandler(apicontract.SystemCheckUpdate, func(c *gin.Context, request apicontract.SystemCheckUpdateRequest) (ret apicontract.Response[apicontract.Null]) {
--	ret = apicontract.Success(apicontract.Null{})
-+	// ret = apicontract.Success(apicontract.Null{})
- 
--	showMsg := request.ShowMsg
--	model.CheckUpdate(showMsg)
-+	// showMsg := request.ShowMsg
-+	// model.CheckUpdate(showMsg)
- 	return
- })
- 
 diff --git forkSrcPrefix/kernel/model/mount.go forkDstPrefix/kernel/model/mount.go
-index fabf5b56305da3980d2d2c23d386691ad97a1bbe..2b97dbed252926021a7d2dd820954efcd576d734 100644
+index 6961d9cc67e729b0ccb4ddaa69c6a66204411951..a869b3fff6aa09e59db5c1070e70e626d79425e5 100644
 --- forkSrcPrefix/kernel/model/mount.go
 +++ forkDstPrefix/kernel/model/mount.go
-@@ -528,8 +528,8 @@ func mountBox(boxID string) (alreadyMount bool, err error) {
+@@ -567,8 +567,8 @@ func mountBox(boxID string) (alreadyMount bool, err error) {
  		task.AppendAsyncTaskWithDelay(task.PushMsg, 3*time.Second, util.PushErrMsg, Conf.Language(244), 7000)
  		go func() {
  			// 每次打开帮助文档时自动检查版本更新并提醒 https://github.com/siyuan-note/siyuan/issues/5057
@@ -112,26 +113,39 @@ index fabf5b56305da3980d2d2c23d386691ad97a1bbe..2b97dbed252926021a7d2dd820954efc
  		}()
  	}
  
-diff --git forkSrcPrefix/kernel/model/updater.go forkDstPrefix/kernel/model/updater.go
-index c639c0e3bcbd758f4d68d0a2525be007e2e8fe79..0de6f03ac346c7f329b2ece5a190004d28e6a0d9 100644
---- forkSrcPrefix/kernel/model/updater.go
-+++ forkDstPrefix/kernel/model/updater.go
-@@ -270,6 +270,10 @@ func isVersionUpToDate(releaseVer string) bool {
- var skipInstallPkgPlatformCached = -1
- 
- func skipNewVerInstallPkg() bool {
-+	// Conf.System.DownloadInstallPkg(自动下载更新安装包) 强制赋值为false
-+	Conf.System.DownloadInstallPkg = false
-+	Conf.Save()
-+
- 	if skipInstallPkgPlatformCached == -1 {
- 		skipInstallPkgPlatformCached = 0
- 		if !gulu.OS.IsWindows() && !gulu.OS.IsDarwin() {
+diff --git forkSrcPrefix/kernel/conf/sync.go forkDstPrefix/kernel/conf/sync.go
+index 2fdeb79c656288be08fb5ec7a886098d994c8c91..3156dad4dbed9b86a1b72e9be065830fcaf727ed 100644
+--- forkSrcPrefix/kernel/conf/sync.go
++++ forkDstPrefix/kernel/conf/sync.go
+@@ -39,8 +39,8 @@ func NewSync() *Sync {
+ 		Enabled:             false,
+ 		Perception:          false,
+ 		Mode:                1,
+-		GenerateConflictDoc: false,
+-		Provider:            ProviderSiYuan,
++		GenerateConflictDoc: true,
++		Provider:            ProviderS3,
+ 		Interval:            30,
+ 		LAN:                 &LANSync{MaxConcurrentReqs: 16},
+ 	}
+diff --git forkSrcPrefix/kernel/conf/system.go forkDstPrefix/kernel/conf/system.go
+index c1f30b54384f0d6540b5954dd591bc0bc8673fa8..24eca999484efb926ea5d0d80d6f3b90c080fb2f 100644
+--- forkSrcPrefix/kernel/conf/system.go
++++ forkDstPrefix/kernel/conf/system.go
+@@ -73,7 +73,7 @@ type Onboarding struct {
+ func NewSystem() *System {
+ 	return &System{
+ 		NetworkProxy:       &NetworkProxy{},
+-		DownloadInstallPkg: true,
++		DownloadInstallPkg: false,
+ 		UpdateChannel:      UpdateChannelStable,
+ 	}
+ }
 diff --git forkSrcPrefix/app/src/config/entryVisibility/catalog.ts forkDstPrefix/app/src/config/entryVisibility/catalog.ts
-index 9414f7865da351df7d42f4dcccb6f8a3decf4275..cf4dcc132a2f95aeb8c20ec1d9ff8f1f121c0a4c 100644
+index 1746a970ef930a7c1c1ed338d046783e51cc9530..b6a356b34cf1aad5a924c8bffe47e31cfcc5a95a 100644
 --- forkSrcPrefix/app/src/config/entryVisibility/catalog.ts
 +++ forkDstPrefix/app/src/config/entryVisibility/catalog.ts
-@@ -626,8 +626,15 @@ const topBarBuiltinChildren = [
+@@ -661,8 +661,15 @@ const topBarBuiltinChildren = [
      node("barBack", lang("goBack")),
      node("barForward", lang("goForward")),
      fixed("drag", lang("entryTopBarDrag")),
@@ -149,33 +163,17 @@ index 9414f7865da351df7d42f4dcccb6f8a3decf4275..cf4dcc132a2f95aeb8c20ec1d9ff8f1f
      node("barPlugins", lang("plugin")),
      node("barCommand", lang("commandPanel")),
      node("barSearch", lang("globalSearch")),
-diff --git forkSrcPrefix/kernel/conf/appearance.go forkDstPrefix/kernel/conf/appearance.go
-index 29011ec0e9208f9be2a43ca198128adaa9f3419a..87412207a6816eb0033d85aea98924b153bf8ce1 100644
---- forkSrcPrefix/kernel/conf/appearance.go
-+++ forkDstPrefix/kernel/conf/appearance.go
-@@ -64,8 +64,8 @@ func NewAppearance() *Appearance {
- 		Icon:                "litheness",
- 		CodeBlockThemeLight: "github",
- 		CodeBlockThemeDark:  "base16/dracula",
--		Lang:                "en",
--		CloseButtonBehavior: 0,
-+		Lang:                "zh_CN",
-+		CloseButtonBehavior: 1,
- 		HideToolbar:         true,
- 		HideStatusBar:       false,
- 		StatusBar:           util.NewStatusBar(util.IsMobileContainer()),
-diff --git forkSrcPrefix/kernel/conf/sync.go forkDstPrefix/kernel/conf/sync.go
-index 2fdeb79c656288be08fb5ec7a886098d994c8c91..3156dad4dbed9b86a1b72e9be065830fcaf727ed 100644
---- forkSrcPrefix/kernel/conf/sync.go
-+++ forkDstPrefix/kernel/conf/sync.go
-@@ -39,8 +39,8 @@ func NewSync() *Sync {
- 		Enabled:             false,
- 		Perception:          false,
- 		Mode:                1,
--		GenerateConflictDoc: false,
--		Provider:            ProviderSiYuan,
-+		GenerateConflictDoc: true,
-+		Provider:            ProviderS3,
- 		Interval:            30,
- 		LAN:                 &LANSync{MaxConcurrentReqs: 16},
- 	}
+diff --git forkSrcPrefix/kernel/model/cloud_service.go forkDstPrefix/kernel/model/cloud_service.go
+index ac787200dd5b9619a199400094f989c595981a5a..3f8c91312a65aa599a3f019d273fb984513c83d9 100644
+--- forkSrcPrefix/kernel/model/cloud_service.go
++++ forkDstPrefix/kernel/model/cloud_service.go
+@@ -321,6 +321,9 @@ func refreshSubscriptionExpirationRemind() {
+ func refreshUser() {
+ 	defer logging.Recover()
+ 
++	// 本地 mock 构建禁用云端账号刷新，避免伪造 token 触发「获取社区用户账号失败」报错
++	return
++
+ 	if user := Conf.GetUser(); nil != user {
+ 		_, err := RefreshUser(user.UserToken)
+ 		if nil != err {
