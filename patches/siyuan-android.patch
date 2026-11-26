@@ -1,5 +1,5 @@
 diff --git forkSrcPrefix/app/build.gradle forkDstPrefix/app/build.gradle
-index e0ec580f86404f2eda00bca72ad3f19c1b744973..8e5bcea2a21820887b94f9fbd5b9b9a60b5608c3 100644
+index ca93fcf..7f1d592 100644
 --- forkSrcPrefix/app/build.gradle
 +++ forkDstPrefix/app/build.gradle
 @@ -5,7 +5,7 @@ plugins {
@@ -11,8 +11,8 @@ index e0ec580f86404f2eda00bca72ad3f19c1b744973..8e5bcea2a21820887b94f9fbd5b9b9a6
  apply from: rootProject.file('buildRelease.gradle')
  
  // 1. 配置 App Bundle (.aab) 的基础文件名
-@@ -46,6 +46,23 @@ android {
-         versionName siyuanVersionName
+@@ -31,6 +31,23 @@ android {
+         versionName = rootProject.siyuanVersionName
      }
  
 +    signingConfigs {
@@ -33,17 +33,17 @@ index e0ec580f86404f2eda00bca72ad3f19c1b744973..8e5bcea2a21820887b94f9fbd5b9b9a6
 +
 +
      buildFeatures {
-         buildConfig true
-     }
-@@ -65,11 +82,13 @@ android {
+         buildConfig = true
+         resValues = true
+@@ -51,11 +68,13 @@ android {
              proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
          }
          debug {
 +            signingConfig signingConfigs.debug
 +
-             applicationIdSuffix ".debug"
+             applicationIdSuffix = ".debug"
  
-             minifyEnabled false
+             minifyEnabled = false
  
 -            resValue "string", "app_name", "SiYuan-Debug"
 +            resValue "string", "app_name", "SiYuan"
