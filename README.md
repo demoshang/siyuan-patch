@@ -1,5 +1,7 @@
 # siyuan patch [思源笔记](https://github.com/siyuan-note/siyuan)本地VIP
 
+> 当前补丁基线：**v3.8.12**（2026-11-26 由 **WorkBuddy**（模型：qwen3.8-flash）适配，详见 [补丁维护指南](./memory.md)）
+
 ## 修改了哪些内容
 
 1. 本地VIP(即官方的 [`功能特性`](https://b3log.org/siyuan/pricing.html)), 可以使用
@@ -12,6 +14,46 @@
 4. 默认关闭 `自动上传报错信息和诊断数据`
 5. 默认关闭 `顶栏显示头衔` `顶栏显示 VIP`
 6. 默认*开启* `点击关闭按钮后缩小到托盘中`
+
+## 补丁如何工作
+
+本仓库不 fork 思源源码，只保存两个 `git diff` 补丁，构建时（GitHub Actions）克隆官方对应 tag 后应用：
+
+- `patches/siyuan.patch` → 应用到 [siyuan-note/siyuan](https://github.com/siyuan-note/siyuan)（Electron 桌面端 / Docker / iOS 共用）
+- `patches/siyuan-android.patch` → 应用到 [siyuan-note/siyuan-android](https://github.com/siyuan-note/siyuan-android)（Android 壳工程）
+
+补丁路径带有 `forkSrcPrefix/` / `forkDstPrefix/` 前缀（历史遗留格式），用 `git apply` 应用即可，前缀不影响匹配。
+
+核心改动位置（升级时需重点核对）：
+
+| 文件 | 改动 |
+| --- | --- |
+| `kernel/api/setting.go` | `getCloudUser` 返回内存 mock 的 VIP 用户（不落盘） |
+| `kernel/model/cloud_service.go` | `refreshUser()` 直接 return，避免伪造 token 触发报错 |
+| `kernel/model/updater.go` | `skipNewVerInstallPkg()` 直接 return true，禁用自动下载安装包 |
+| `kernel/api/system.go` / `kernel/model/mount.go` | 注释掉 `CheckUpdate` 调用 |
+| `kernel/conf/appearance.go` | 默认 `zh_CN`、关闭按钮最小化到托盘 |
+| `kernel/conf/sync.go` / `kernel/conf/system.go` | 同步默认 S3、`DownloadInstallPkg: false` |
+| `app/src/config/entryVisibility/catalog.ts` | 顶栏 VIP / 头衔默认隐藏 |
+| `app/build.gradle`(android) | 注释 `signings.gradle`，内置 debug 签名配置 |
+
+## 本次 v3.8.12 适配说明（2026-11-26）
+
+**问题**：官方发布 v3.8.12 后 CI 构建失败，`git apply --3way` 报 `patch does not apply`。
+
+**原因**：
+
+1. `kernel/conf/appearance.go` 的 `NewAppearanceForContainer` 新增了 `ShowFloatingDockBar`、`Notifications` 等字段，gofmt 对齐宽度变化，旧补丁上下文匹配失败；浅克隆导致 blob 缺失，`--3way` 也无法回退三方合并。
+2. siyuan-android 仓库重构了 `app/build.gradle`：`signingConfigs` 移到了 `signings.gradle`（仓库中只剩 `signings.templates.gradle`），且语法改为 `key = value` 赋值风格，旧补丁 hunk 上下文完全失效。
+3. 其余文件仅行号漂移，`git apply` 可自动偏移，无需改动。
+
+**修复方法**（完整流程见 [memory.md](./memory.md)）：克隆干净的 v3.8.12 源码 → 应用旧补丁（能自动应用的部分）→ 手工修复失效的 hunk → 用 `git diff --src-prefix=forkSrcPrefix/ --dst-prefix=forkDstPrefix/` 重新生成补丁 → `git apply --check` 与 `go build` 双重验证。
+
+**验证结果**：新补丁对 v3.8.12 tag 与最新 master 分支均可干净应用；打补丁后 kernel `go build ./api/... ./model/... ./conf/...` 编译通过；6 项功能语义全部保留。
+
+## 关于维护
+
+本项目由 **WorkBuddy**（AI 助手，当前模型：qwen3.8-flash）维护：每次思源发新版后，由 WorkBuddy 按 [memory.md](./memory.md) 中记录的流程重新适配补丁并验证提交。若你使用 AI 助手维护本仓库，请直接照做该指南即可。
 
 ## 如何下载 客户端(Windows / Mac / Linux / Android)
 
